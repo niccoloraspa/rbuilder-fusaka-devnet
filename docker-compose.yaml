@@ -1,0 +1,165 @@
+services:
+
+  lighthouse:
+    image: docker.ethquokkaops.io/dh/ethpandaops/lighthouse:getBlobs-flag-d3c0634
+    container_name: lighthouse
+    restart: unless-stopped
+    user: "1000:1000"
+    depends_on:
+    - reth
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 16g
+        reservations:
+          cpus: "1"
+          memory: 2g
+    command:
+      - lighthouse
+      - beacon_node
+      - --datadir=/data
+      - --disable-upnp
+      - --disable-enr-auto-update
+      - --enr-address=206.81.6.4
+      - --enr-tcp-port=9000
+      - --enr-udp-port=9000
+      - --listen-address=0.0.0.0
+      - --port=9000
+      - --discovery-port=9000
+      - --http
+      - --http-address=0.0.0.0
+      - --http-port=5052
+      - --execution-jwt=/etc/jwt.secret
+      - --execution-endpoint=http://reth:8551
+      - --metrics
+      - --metrics-address=0.0.0.0
+      - --metrics-allow-origin=*
+      - --metrics-port=5054
+      - --quic-port=9001
+      - --enr-quic-port=9001
+      - --subscribe-all-data-column-subnets
+      - --testnet-dir=/network-config
+      - "--boot-nodes=enr:-Iq4QNSw_2dfFEo8kAfzQUc8K9yvJ2Vj5MZVwobvvpnrwiOeQRw0l3l_BqUx5xjOhs384NgfpVyQ-s6WKiTT99qgOCmGAZg3XXaEgmlkgnY0gmlwhLI-72SJc2VjcDI1NmsxoQJJ3h8aUO3GJHv-bdvHtsQZ2OEisutelYfGjXO4lSg8BYN1ZHCCIzI,enr:-MK4QDrDG9VJs-6Bds13WA-zMYrr_J9sfIey2n6M7zGoc592aR6VuzGgW7nXwIQJwOYx7bVdsMvYrRQAcQWmgutiN5CBkYdhdHRuZXRziAAAAAAAYAAAg2NnY4GAhGV0aDKQzoUtcHAgI2H__________4JpZIJ2NIJpcISyPu9kg25mZIQAAAAAiXNlY3AyNTZrMaEChJEOtidITwModj1mcXZ8xC40-_vfhMfs3T4b2gIZ2j-DdGNwgiMog3VkcIIjKA,enr:-QEauEBx_3ExHeGDz1QkOYynebYdIaMtNzgFoZimnvy8m5pSFzD38XPHIJ4pc7nFUujaYlBrv9PIHIAGBpAsLEOu7YDGZ4dhdHRuZXRziAAAAAAAAwAAg2NnY4GAhmNsaWVudNGKTGlnaHRob3VzZYU3LjEuMIRldGgykM6FLXBwICNh__________-CaWSCdjSCaXCEjl30yoNpcDaQJgSogAQAANEAAAAChAewAYNuZmSEzoUtcIRxdWljgiMphXF1aWM2giMpiXNlY3AyNTZrMaECK_HazU_XNGpKd6eYYraNeEsMX8UwldgnFfu3uu9LRE6Ic3luY25ldHMNg3RjcIIjKIR0Y3A2giMog3VkcIIjKIR1ZHA2giMo,enr:-Nm4QNNpQj5zJKzMBy1k2Bn1atYDg95Q-86hSOP316sATA1ZeNZ6AqzRsSgEH9c5mJdmmmXPezPV3C3KgZZuq_6HbNGGAZhiINhwh2F0dG5ldHOIAADAAAAAAACDY2djgYCEZXRoMpDOhS1wcCAjYf__________gmlkgnY0gmlwhIpEZhODbmZkhAAAAACEcXVpY4IyyIlzZWNwMjU2azGhApE01MBaLWRKhdpeqmul1RTBoDy6LA3dolUTxno5uSwkiHN5bmNuZXRzAIN0Y3CCIyiDdWRwgiMo,enr:-MK4QBo3LHX8r0ppEXKvLruGkQ8CFwjYDxPVR1Zi0YCo8wQeAd61Fj_8t5ODgQNDUl1ZF9J0P3hzmRDfm31tOxNif7uB1odhdHRuZXRziMAAAAAAAAAAg2NnY4GAhGV0aDKQzoUtcHAgI2H__________4JpZIJ2NIJpcISAxzTOg25mZIQAAAAAiXNlY3AyNTZrMaEDieaqLOQHz3c7dz612CFvlYu6S_apAPd2YlJh0CdS-dqDdGNwgiMog3VkcIIjKA,enr:-Nm4QFwm9Qd_5sfnpcUi9BCG0cJX8tewy7dazEDysCgBYJ-jKPqt26IzcMyKxcPokhZ3sMsvzk20DP7Erk1FV53eL1OGAZhiIgu_h2F0dG5ldHOIDAAAAAAAAACDY2djgYCEZXRoMpDOhS1wcCAjYf__________gmlkgnY0gmlwhK6KUEyDbmZkhAAAAACEcXVpY4IyyIlzZWNwMjU2azGhAvOg_HXhvgdyzbAJBf06-pWCsnf6F3_7qEm9tzin1nm-iHN5bmNuZXRzDYN0Y3CCIyiDdWRwgiMo"
+      - --always-prepare-payload
+      - --prepare-payload-lookahead=8000
+      - --suggested-fee-recipient=0xf97e180c050e5Ab072211Ad2C213Eb5AEE4DF134
+      - --checkpoint-sync-url=https://checkpoint-sync.fusaka-devnet-3.ethpandaops.io
+    volumes:
+      - ./data/lighthouse:/data:rw
+      - ./config/networks/devnet-3/metadata:/network-config:ro
+      - ./config/reth/jwt.secret:/etc/jwt.secret:ro
+    ports:
+      - "9000:9000/tcp"
+      - "9000:9000/udp"
+      - "9001:9001/tcp"
+      - "9001:9001/udp"
+      - "5052:5052"
+      - "5054:5054"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+        max-file: "8"
+    networks:
+      - fusaka-devnet-3
+
+  reth:
+    image: docker.ethquokkaops.io/dh/ethpandaops/reth:fusaka-devnet-3
+    user: "1000:1000"
+    container_name: reth
+    restart: unless-stopped
+    entrypoint: ["/usr/local/bin/reth"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 16g
+        reservations:
+          cpus: "1"
+          memory: 2g
+    command:
+      - node
+      - --datadir=/data
+      - --log.file.directory=/data/logs
+      - --port=30303
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/etc/jwt.secret
+      - --nat=extip:206.81.6.4
+      - --metrics=0.0.0.0:6060
+      - --chain=/network-config/genesis.json
+      - "--bootnodes=enode://f9df4eafbaa13bfb6937d3291241cea8155b0604e261b3b0f55405631690ad0136d2b30f8583fbe32152a40953365bd91d2f756a17629ad570e2d2031aa5b248@178.62.239.100:30303?discport=30303,enode://a269c94f91d6379d4238ab00c94a223ec4ad8a7207b9ec39e6a5813d9cf08a92691e5a9f72ac3905381357a77f94b082a1e2b708c42add3d7d5edf7cd4265e88@142.93.244.202:30303?discport=30303,enode://2cfa672891371b101c368acb8ffabcd358b858a2efb076d0715b9f9f6ebb8488f8dc403023243f3425f20f7dce3e3f74be5bae45341b3a7f7f192e39574bf2f1@138.68.102.19:30303?discport=30303,enode://198ce5006e0b84438cda4bf3f1496a5c5e1fbb0f5496729a30a8a79854dfc531b0d4fe8bc1f2fd2a6f3689d7f91eb36d1022738749cc48670fabfe432a7711f5@128.199.52.206:30303?discport=30303,enode://52ea6aadada58f031cf4527b6c5f70bc77859cba11a9d9eaaab77078a440e706c9d2f560e45cd4298b35d21e222d29e84bdb54d7c59006469c93a994af6836c4@174.138.80.76:30303?discport=30303"
+      - --http.api=trace,rpc,eth,net,debug,web3,admin,txpool
+      - --ws.api=trace,rpc,eth,net,debug,web3,admin,txpool
+      - --ws.origins=*
+      - --builder.gaslimit=45000000
+      - --engine.persistence-threshold=0
+      - --engine.memory-block-buffer-target=0
+      - --ipcpath=/data/reth.ipc
+    ports:
+      - "0.0.0.0:30303:30303/tcp"
+      - "0.0.0.0:30303:30303/udp"
+      - "127.0.0.1:6060:6060"
+      - "127.0.0.1:8545:8545"
+      - "127.0.0.1:8546:8546"
+      - "127.0.0.1:8551:8551"
+    volumes:
+      - ./data/reth:/data:rw
+      - ./config/networks/devnet-3/metadata:/network-config:ro
+      - ./config/reth/jwt.secret:/etc/jwt.secret:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+        max-file: "8"
+    networks:
+      - fusaka-devnet-3
+
+  rbuilder:
+    image: niccoloraspa/rbuilder:fusaka-devnet-3
+    user: "1000:1000"
+    pid: "container:reth"  # Needed for the rbuilder to lock the reth db
+    container_name: rbuilder
+    restart: unless-stopped
+    depends_on:
+    - reth
+    entrypoint: ["/app/rbuilder"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 16g
+        reservations:
+          cpus: "1"
+          memory: 2g
+    command:
+      - run
+      - /app/rbuilder.toml
+    volumes:
+      - ./data/reth:/app/reth:rw
+      - ./config/networks/devnet-3/metadata:/app/network-config:ro
+      - ./config/rbuilder/rbuilder.toml:/app/rbuilder.toml:ro
+    env_file:
+      - ./config/rbuilder/rbuilder.env
+    ports:
+      - "127.0.0.1:7060:6060"
+      - "127.0.0.1:7061:6061"
+      - "127.0.0.1:8645:8645"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+        max-file: "8"
+    networks:
+      - fusaka-devnet-3
+
+networks:
+  fusaka-devnet-3:
+    driver: bridge
